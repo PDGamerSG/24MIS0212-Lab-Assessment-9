@@ -2,7 +2,7 @@
 
 One repository for all three questions of ISWE406P. The supplied PDF is headed Assessment VIII.
 
-Completed assignment: [Word document](report/DA%209.docx) and [PDF](report/DA%209.pdf), with 34 reviewed pages and 49 embedded images. The cover, body typography, border and Question/Step structure follow the supplied DA 8 reference.
+Completed assignment: [Word document](report/DA%209.docx) and [PDF](report/DA%209.pdf), with 28 reviewed pages and 40 embedded images. The cover, body typography, border and Question/Step structure follow the supplied DA 8 reference. Stage View is presented as the original heading followed by the successful green build rows #4, #3 and #2.
 
 | Question | Application | Replicas | NodePort | Release strategy |
 |---|---|---:|---:|---|
