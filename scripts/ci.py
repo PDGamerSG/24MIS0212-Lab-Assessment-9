@@ -3,6 +3,7 @@ import hashlib,json,os,re,shutil,subprocess,sys,time,urllib.request
 from pathlib import Path
 APP=os.environ.get("APP","lms-portal")
 SHORT={"lms-portal":"lms","food-portal":"food","hospital-portal":"hospital"}[APP]
+TESTPORT={"lms-portal":8191,"food-portal":8192,"hospital-portal":8193}[APP]
 PORT={"lms-portal":30081,"food-portal":30082,"hospital-portal":30083}[APP]
 REPLICAS=2 if APP=="lms-portal" else 3
 FAULTY=os.environ.get("FAULTY","false").lower()=="true"
@@ -46,15 +47,15 @@ def build():
 def test():
     name="assessment9-smoke-"+os.environ.get("BUILD_NUMBER","local")
     try:
-        run("docker","run","-d","--name",name,"--restart","no","-p","127.0.0.1:8199:80",IMAGE)
+        run("docker","run","-d","--name",name,"--restart","no","-p",f"127.0.0.1:{TESTPORT}:80",IMAGE)
         run("docker","exec",name,"nginx","-t")
-        actual=http("http://127.0.0.1:8199/")
+        actual=http(f"http://127.0.0.1:{TESTPORT}/")
         if actual!=(Path(APP)/"index.html").read_bytes():raise RuntimeError("HTML differs from Git source")
         log.append("PASS: HTTP 200, valid nginx config, source SHA-256 "+hashlib.sha256(actual).hexdigest())
         print(log[-1],flush=True)
         # Controlled fault injection preserves the root-page smoke test but makes
         # the readiness endpoint return 503; Kubernetes must reject this image.
-        if not FAULTY:http("http://127.0.0.1:8199/healthz")
+        if not FAULTY:http(f"http://127.0.0.1:{TESTPORT}/healthz")
     finally:run("docker","rm","-f",name,check=False)
 def push():
     r=subprocess.run(["docker","login","--username",os.environ["DOCKER_USER"],"--password-stdin"],input=os.environ["DOCKER_PASS"]+"\n",text=True,capture_output=True)
@@ -63,7 +64,11 @@ def push():
     run("docker","push",IMAGE)
 def deploy():
     s=state();run("kubectl","--context","docker-desktop","apply","-f","k8s/namespace.yaml")
-    svc=obj("get","service",APP)
+    raw_service=kube("get","service",APP,"-o","json",check=False,capture=True)
+    try:svc=json.loads(raw_service)
+    except Exception:
+        kube("apply","-f",str(Path(APP)/"service.yaml"))
+        svc=obj("get","service",APP)
     if APP=="food-portal":
         active=svc["spec"]["selector"].get("slot")
         candidate="green" if active=="blue" else "blue";name=APP+"-"+candidate
@@ -73,8 +78,11 @@ def deploy():
         except Exception:s["candidate_previous_image"]=None
         text=(Path(APP)/"deployment.yaml").read_text().replace("name: food-portal-blue","name: "+name).replace("slot: blue","slot: "+candidate)
     else:
-        name=APP;dep=obj("get","deployment",name)
-        s.update(deployment=name,previous_image=dep["spec"]["template"]["spec"]["containers"][0]["image"])
+        name=APP
+        raw_deployment=kube("get","deployment",name,"-o","json",check=False,capture=True)
+        try:previous_image=json.loads(raw_deployment)["spec"]["template"]["spec"]["containers"][0]["image"]
+        except Exception:previous_image=None
+        s.update(deployment=name,previous_image=previous_image)
         text=(Path(APP)/"deployment.yaml").read_text()
     text=re.sub(r"image: \S+","image: "+IMAGE,text)
     (E/"candidate.yaml").write_text(text,encoding="utf-8");save(s)
@@ -85,6 +93,7 @@ def deploy():
     if APP=="food-portal":
         kube("patch","service",APP,"--type=merge","-p",json.dumps({"spec":{"selector":{"app":APP,"slot":candidate}}}))
         log.append("BLUE-GREEN PROMOTION: healthy "+candidate+" receives production traffic")
+        kube("delete","deployment","food-portal","--ignore-not-found=true")
     forward()
 def rollback():
     s=state();name=s["deployment"]
