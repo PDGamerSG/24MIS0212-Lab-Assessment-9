@@ -1,7 +1,8 @@
 """Windows Jenkins CI/CD with versioned images, blue-green promotion and rollback."""
 import hashlib,json,os,re,shutil,subprocess,sys,time,urllib.request
 from pathlib import Path
-APP=os.environ.get("APP","lms-portal")
+default_app="food-portal" if "Q2" in os.environ.get("JOB_NAME","") else "hospital-portal" if "Q3" in os.environ.get("JOB_NAME","") else "lms-portal"
+APP=os.environ.get("APP",default_app)
 SHORT={"lms-portal":"lms","food-portal":"food","hospital-portal":"hospital"}[APP]
 TESTPORT={"lms-portal":8191,"food-portal":8192,"hospital-portal":8193}[APP]
 PORT={"lms-portal":30081,"food-portal":30082,"hospital-portal":30083}[APP]
