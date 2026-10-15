@@ -4,7 +4,7 @@ pipeline {
     triggers { pollSCM('H/2 * * * *') }
     parameters {
         choice(name: 'APP', choices: ['lms-portal', 'food-portal', 'hospital-portal'], description: 'Portal')
-        string(name: 'RELEASE', defaultValue: 'v1', description: 'Release label')
+        string(name: 'RELEASE', defaultValue: 'v2', description: 'Release label')
         booleanParam(name: 'FAULTY', defaultValue: false, description: 'Inject HTTP 503 at /healthz to prove rollback')
     }
     environment {
