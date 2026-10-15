@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+    options { skipDefaultCheckout(); disableConcurrentBuilds(); timeout(time: 20, unit: 'MINUTES') }
+    triggers { pollSCM('H/2 * * * *') }
+    parameters {
+        choice(name: 'APP', choices: ['lms-portal', 'food-portal', 'hospital-portal'], description: 'Portal')
+        string(name: 'RELEASE', defaultValue: 'v1', description: 'Release label')
+        booleanParam(name: 'FAULTY', defaultValue: false, description: 'Inject HTTP 503 at /healthz to prove rollback')
+    }
+    environment {
+        DOCKER_HOST = 'npipe:////./pipe/dockerDesktopLinuxEngine'
+        PATH = "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python313;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\Git\\cmd;${env.PATH}"
+        DOCKER_CONFIG = "${WORKSPACE}\\.docker-assessment9"
+    }
+    stages {
+        stage('Clone Code') {
+            steps { git branch: 'main', url: 'https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-9.git' }
+        }
+        stage('Build Docker Image') { steps { bat 'python scripts/ci.py build' } }
+        stage('Test Application') { steps { bat 'python scripts/ci.py test' } }
+        stage('Push Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat 'python scripts/ci.py push'
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: 'assessment9-kubeconfig', variable: 'KUBECONFIG')]) {
+                    script {
+                        int code = bat(returnStatus: true, script: 'python scripts/ci.py deploy')
+                        env.ROLLOUT_FAILED = code == 0 ? 'false' : 'true'
+                        if (code != 0) {
+                            catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                                error('Readiness rejected the candidate release.')
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('Automatic Rollback') {
+            when { expression { env.ROLLOUT_FAILED == 'true' } }
+            steps {
+                withCredentials([file(credentialsId: 'assessment9-kubeconfig', variable: 'KUBECONFIG')]) {
+                    bat 'python scripts/ci.py rollback'
+                }
+            }
+        }
+        stage('Verify NodePort and Pods') {
+            steps {
+                withCredentials([file(credentialsId: 'assessment9-kubeconfig', variable: 'KUBECONFIG')]) {
+                    bat 'python scripts/ci.py verify'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: 'evidence/*.txt,evidence/*.json', allowEmptyArchive: true, fingerprint: true
+            bat 'python scripts/ci.py cleanup'
+        }
+    }
+}

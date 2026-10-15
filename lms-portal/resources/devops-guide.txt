@@ -1,0 +1,5 @@
+DEVOPS REVISION GUIDE
+Git: version control and review
+Docker: build, test and publish images
+Jenkins: automate continuous delivery
+Kubernetes: replicas, readiness, services and rollback

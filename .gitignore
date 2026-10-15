@@ -1,0 +1,4 @@
+.docker-assessment9/
+__pycache__/
+*.pyc
+evidence/candidate.yaml
