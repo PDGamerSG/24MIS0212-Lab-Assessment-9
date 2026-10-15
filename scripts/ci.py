@@ -63,6 +63,10 @@ def push():
     print("Docker Hub login: "+("successful" if r.returncode==0 else "failed"),flush=True)
     if r.returncode:raise RuntimeError("Docker Hub authentication failed")
     run("docker","push",IMAGE)
+    if not FAULTY:
+        alias=IMAGE.rsplit(":",1)[0]+":"+os.environ.get("RELEASE","v2")
+        run("docker","tag",IMAGE,alias)
+        run("docker","push",alias)
 def deploy():
     s=state();run("kubectl","--context","docker-desktop","apply","-f","k8s/namespace.yaml")
     raw_service=kube("get","service",APP,"-o","json",check=False,capture=True)

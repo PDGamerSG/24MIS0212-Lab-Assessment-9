@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: food-portal
-          image: pdgamersg/assessment9-food:v1
+          image: pdgamersg/assessment9-food:v2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: lms-portal
-          image: pdgamersg/assessment9-lms:v1
+          image: pdgamersg/assessment9-lms:v2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

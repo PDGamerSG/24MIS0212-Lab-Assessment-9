@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: hospital-portal
-          image: pdgamersg/assessment9-hospital:v1
+          image: pdgamersg/assessment9-hospital:v2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
