@@ -45,7 +45,7 @@ def build():
     finally:p.write_text(original,encoding="utf-8")
     save({"app":APP,"image":IMAGE,"version":VERSION,"faulty":FAULTY})
 def test():
-    name="assessment9-smoke-"+os.environ.get("BUILD_NUMBER","local")
+    name="assessment9-smoke-"+SHORT+"-"+os.environ.get("BUILD_NUMBER","local")
     try:
         run("docker","run","-d","--name",name,"--restart","no","-p",f"127.0.0.1:{TESTPORT}:80",IMAGE)
         run("docker","exec",name,"nginx","-t")
