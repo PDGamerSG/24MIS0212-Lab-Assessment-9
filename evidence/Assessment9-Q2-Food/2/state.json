@@ -1,0 +1,10 @@
+{
+  "app": "food-portal",
+  "image": "pdgamersg/assessment9-food:v1-2",
+  "version": "v1-2",
+  "faulty": false,
+  "previous_slot": null,
+  "candidate_slot": "blue",
+  "deployment": "food-portal-blue",
+  "candidate_previous_image": null
+}

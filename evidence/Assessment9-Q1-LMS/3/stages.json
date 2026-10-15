@@ -1,0 +1,135 @@
+{
+  "_links": {
+    "self": {
+      "href": "/job/Assessment9-Q1-LMS/3/wfapi/describe"
+    },
+    "changesets": {
+      "href": "/job/Assessment9-Q1-LMS/3/wfapi/changesets"
+    },
+    "artifacts": {
+      "href": "/job/Assessment9-Q1-LMS/3/wfapi/artifacts"
+    }
+  },
+  "id": "3",
+  "name": "#3",
+  "status": "SUCCESS",
+  "startTimeMillis": 1792080851377,
+  "endTimeMillis": 1792080889814,
+  "durationMillis": 38437,
+  "queueDurationMillis": 9,
+  "pauseDurationMillis": 0,
+  "stages": [
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q1-LMS/3/execution/node/10/wfapi/describe"
+        }
+      },
+      "id": "10",
+      "name": "Clone Code",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792080854935,
+      "durationMillis": 1736,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q1-LMS/3/execution/node/15/wfapi/describe"
+        }
+      },
+      "id": "15",
+      "name": "Build Docker Image",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792080856686,
+      "durationMillis": 2879,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q1-LMS/3/execution/node/20/wfapi/describe"
+        }
+      },
+      "id": "20",
+      "name": "Test Application",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792080859593,
+      "durationMillis": 2529,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q1-LMS/3/execution/node/25/wfapi/describe"
+        }
+      },
+      "id": "25",
+      "name": "Push Image",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792080862155,
+      "durationMillis": 14823,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q1-LMS/3/execution/node/34/wfapi/describe"
+        }
+      },
+      "id": "34",
+      "name": "Deploy to Kubernetes",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792080876992,
+      "durationMillis": 10974,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q1-LMS/3/execution/node/47/wfapi/describe"
+        }
+      },
+      "id": "47",
+      "name": "Automatic Rollback",
+      "execNode": "",
+      "status": "NOT_EXECUTED",
+      "startTimeMillis": 1792080887985,
+      "durationMillis": 65,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q1-LMS/3/execution/node/52/wfapi/describe"
+        }
+      },
+      "id": "52",
+      "name": "Verify NodePort and Pods",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792080888065,
+      "durationMillis": 1178,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q1-LMS/3/execution/node/61/wfapi/describe"
+        }
+      },
+      "id": "61",
+      "name": "Declarative: Post Actions",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792080889257,
+      "durationMillis": 380,
+      "pauseDurationMillis": 0
+    }
+  ]
+}

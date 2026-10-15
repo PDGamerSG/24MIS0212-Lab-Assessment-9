@@ -1,0 +1,10 @@
+{
+  "app": "food-portal",
+  "image": "pdgamersg/assessment9-food:broken-5",
+  "version": "broken-5",
+  "faulty": true,
+  "previous_slot": "blue",
+  "candidate_slot": "green",
+  "deployment": "food-portal-green",
+  "candidate_previous_image": "pdgamersg/assessment9-food:v1-3"
+}

@@ -1,0 +1,8 @@
+{
+  "url": "http://localhost:30082",
+  "replicas": 3,
+  "http_status": 200,
+  "sha256": "63466e2a7f8baab16713204f07e634846bb7503f0af15ca2830dbc254ba7a357",
+  "candidate_image": "pdgamersg/assessment9-food:v1-2",
+  "faulty_candidate_rejected": false
+}

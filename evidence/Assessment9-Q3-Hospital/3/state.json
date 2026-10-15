@@ -1,0 +1,8 @@
+{
+  "app": "hospital-portal",
+  "image": "pdgamersg/assessment9-hospital:v1-3",
+  "version": "v1-3",
+  "faulty": false,
+  "deployment": "hospital-portal",
+  "previous_image": "pdgamersg/assessment9-hospital:v1-2"
+}

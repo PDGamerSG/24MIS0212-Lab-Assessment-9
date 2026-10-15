@@ -1,0 +1,10 @@
+$ docker run -d --name assessment9-smoke-hospital-2 --restart no -p 127.0.0.1:8193:80 pdgamersg/assessment9-hospital:v1-2
+68921d3360df9944fe24d3ab7c206cdc3a724c971ea0558e1983cec46d1d07bb
+
+$ docker exec assessment9-smoke-hospital-2 nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+PASS: HTTP 200, valid nginx config, source SHA-256 d8709106704c48ea5d723f5619d458f422aa8f2f3369a3d36852e80317d16c75
+$ docker rm -f assessment9-smoke-hospital-2
+assessment9-smoke-hospital-2

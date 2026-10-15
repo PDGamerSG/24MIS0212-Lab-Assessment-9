@@ -1,0 +1,1577 @@
+Started by user Pallab Das
+Obtained food-portal/Jenkinsfile from git https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-9.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] timeout
+Timeout set to expire in 20 min
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Clone Code)
+[Pipeline] git
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git.exe rev-parse --resolve-git-dir C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food\.git # timeout=10
+Fetching changes from the remote Git repository
+ > git.exe config remote.origin.url https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-9.git # timeout=10
+Fetching upstream changes from https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-9.git
+ > git.exe --version # timeout=10
+ > git --version # 'git version 2.53.0.windows.2'
+ > git.exe fetch --tags --force --progress -- https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-9.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git.exe rev-parse "refs/remotes/origin/main^{commit}" # timeout=10
+Checking out Revision 1a74934c7e65a70ae1f743ad771c1b76df7229f4 (refs/remotes/origin/main)
+ > git.exe config core.sparsecheckout # timeout=10
+ > git.exe checkout -f 1a74934c7e65a70ae1f743ad771c1b76df7229f4 # timeout=10
+ > git.exe branch -a -v --no-abbrev # timeout=10
+ > git.exe branch -D main # timeout=10
+ > git.exe checkout -b main 1a74934c7e65a70ae1f743ad771c1b76df7229f4 # timeout=10
+Commit message: "Publish stable release aliases and simplify the verified rollout implementation"
+ > git.exe rev-list --no-walk 1a74934c7e65a70ae1f743ad771c1b76df7229f4 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Docker Image)
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food>python scripts/ci.py build 
++ docker build -t pdgamersg/assessment9-food:broken-5 food-portal
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 253B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/nginx:1.27-alpine
+#2 DONE 1.8s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 84B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 6.30kB done
+#4 DONE 0.1s
+
+#5 [1/3] FROM docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+#5 resolve docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+#5 resolve docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 0.1s done
+#5 CACHED
+
+#6 [2/3] COPY nginx.conf /etc/nginx/conf.d/default.conf
+#6 DONE 0.0s
+
+#7 [3/3] COPY . /usr/share/nginx/html/
+#7 DONE 0.1s
+
+#8 exporting to image
+#8 exporting layers
+#8 exporting layers 0.2s done
+#8 exporting manifest sha256:4a84c152f8edf832975519362cc15dc1d0b9eef6dbec2c2b207aa850b3b63504 0.0s done
+#8 exporting config sha256:68a54864f2cffcf5c1ab8bb876396e0f87b20dcb301ed6bbca1d6e509f017716 0.0s done
+#8 exporting attestation manifest sha256:c1d5fb8555ae02fe4186eb03f9d3139baa237a27c3b995a59c09c85ca7403c2f 0.1s done
+#8 exporting manifest list sha256:f7294b0e41c1977652c94d03bf32bc0a5e8def5066cea0fd81cffdc918f5e53c
+#8 exporting manifest list sha256:f7294b0e41c1977652c94d03bf32bc0a5e8def5066cea0fd81cffdc918f5e53c 0.0s done
+#8 naming to docker.io/pdgamersg/assessment9-food:broken-5 done
+#8 unpacking to docker.io/pdgamersg/assessment9-food:broken-5 0.1s done
+#8 DONE 0.5s
+
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Test Application)
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food>python scripts/ci.py test 
++ docker run -d --name assessment9-smoke-food-5 --restart no -p 127.0.0.1:8192:80 pdgamersg/assessment9-food:broken-5
+9026d430a6c4e747b675fe11e31a3d5eef60c45d34ad8b58c7e294dae77697be
+
++ docker exec assessment9-smoke-food-5 nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+PASS: HTTP 200, valid nginx config, source SHA-256 7a7a0f62905626d7002fc74fb6fb99cd3ffbbe85152518956a6b0becadfa003c
++ docker rm -f assessment9-smoke-food-5
+assessment9-smoke-food-5
+
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Push Image)
+[Pipeline] withCredentials
+Masking supported pattern matches of %DOCKER_PASS%
+[Pipeline] {
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food>python scripts/ci.py push 
+Docker Hub login: successful
++ docker push pdgamersg/assessment9-food:broken-5
+The push refers to repository [docker.io/pdgamersg/assessment9-food]
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+d7e507024086: Layer already exists
+61ca4f733c80: Layer already exists
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Waiting
+81bd8ed7ec67: Waiting
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+848d6fb132e7: Waiting
+34a64644b756: Layer already exists
+81bd8ed7ec67: Layer already exists
+197eb75867ef: Waiting
+38f2ed962b8a: Waiting
+b464cfdf2a63: Waiting
+aed406a8cfc2: Waiting
+f18232174bc9: Waiting
+39c2ddfd6010: Waiting
+aed406a8cfc2: Waiting
+f18232174bc9: Layer already exists
+39c2ddfd6010: Layer already exists
+848d6fb132e7: Waiting
+197eb75867ef: Layer already exists
+38f2ed962b8a: Waiting
+b464cfdf2a63: Layer already exists
+38f2ed962b8a: Waiting
+aed406a8cfc2: Waiting
+38f2ed962b8a: Waiting
+aed406a8cfc2: Waiting
+38f2ed962b8a: Waiting
+aed406a8cfc2: Waiting
+848d6fb132e7: Pushed
+aed406a8cfc2: Pushed
+38f2ed962b8a: Pushed
+broken-5: digest: sha256:f7294b0e41c1977652c94d03bf32bc0a5e8def5066cea0fd81cffdc918f5e53c size: 856
+
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy to Kubernetes)
+[Pipeline] withCredentials
+Masking supported pattern matches of %KUBECONFIG%
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food>python scripts/ci.py deploy 
++ kubectl --context docker-desktop apply -f k8s/namespace.yaml
+namespace/assessment9 unchanged
+
++ kubectl --context docker-desktop -n assessment9 get service food-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"food-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30082,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"food-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "food-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "5743",
+        "uid": "4562796b-1450-454f-9ac2-8fe2757f298e"
+    },
+    "spec": {
+        "clusterIP": "10.96.79.197",
+        "clusterIPs": [
+            "10.96.79.197"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30082,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "food-portal",
+            "slot": "blue"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
++ kubectl --context docker-desktop -n assessment9 get deployment food-portal-green -o json
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "1",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"food-portal-green\",\"namespace\":\"assessment9\"},\"spec\":{\"progressDeadlineSeconds\":60,\"replicas\":3,\"revisionHistoryLimit\":5,\"selector\":{\"matchLabels\":{\"app\":\"food-portal\",\"slot\":\"green\"}},\"strategy\":{\"rollingUpdate\":{\"maxSurge\":1,\"maxUnavailable\":0},\"type\":\"RollingUpdate\"},\"template\":{\"metadata\":{\"labels\":{\"app\":\"food-portal\",\"slot\":\"green\"}},\"spec\":{\"containers\":[{\"image\":\"pdgamersg/assessment9-food:v1-3\",\"imagePullPolicy\":\"IfNotPresent\",\"livenessProbe\":{\"httpGet\":{\"path\":\"/healthz\",\"port\":80},\"initialDelaySeconds\":5,\"periodSeconds\":10},\"name\":\"food-portal\",\"ports\":[{\"containerPort\":80}],\"readinessProbe\":{\"httpGet\":{\"path\":\"/healthz\",\"port\":80},\"initialDelaySeconds\":2,\"periodSeconds\":3},\"resources\":{\"limits\":{\"cpu\":\"250m\",\"memory\":\"64Mi\"},\"requests\":{\"cpu\":\"10m\",\"memory\":\"16Mi\"}}}]}}}}\n"
+        },
+        "creationTimestamp": "2026-10-15T16:14:38Z",
+        "generation": 1,
+        "name": "food-portal-green",
+        "namespace": "assessment9",
+        "resourceVersion": "5067",
+        "uid": "fcee56f0-8313-43d7-be42-65b923102254"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 60,
+        "replicas": 3,
+        "revisionHistoryLimit": 5,
+        "selector": {
+            "matchLabels": {
+                "app": "food-portal",
+                "slot": "green"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": 1,
+                "maxUnavailable": 0
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "food-portal",
+                    "slot": "green"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-food:v1-3",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "food-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 3,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-15T16:14:43Z",
+                "lastUpdateTime": "2026-10-15T16:14:43Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-10-15T16:14:38Z",
+                "lastUpdateTime": "2026-10-15T16:14:43Z",
+                "message": "ReplicaSet \"food-portal-green-6cd476b456\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 1,
+        "readyReplicas": 3,
+        "replicas": 3,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 3
+    }
+}
+
++ kubectl --context docker-desktop -n assessment9 apply -f evidence\candidate.yaml
+deployment.apps/food-portal-green configured
+
++ kubectl --context docker-desktop -n assessment9 rollout status deployment/food-portal-green --timeout=75s
+Waiting for deployment "food-portal-green" rollout to finish: 1 out of 3 new replicas have been updated...
+error: deployment "food-portal-green" exceeded its progress deadline
+
++ kubectl --context docker-desktop -n assessment9 get pods -l app=food-portal -o wide
+NAME                                 READY   STATUS    RESTARTS      AGE     IP            NODE                    NOMINATED NODE   READINESS GATES
+food-portal-blue-6647dc7f85-6b54t    1/1     Running   0             2m21s   10.244.0.45   desktop-control-plane   <none>           <none>
+food-portal-blue-6647dc7f85-7xckb    1/1     Running   0             2m16s   10.244.0.46   desktop-control-plane   <none>           <none>
+food-portal-blue-6647dc7f85-fl8m9    1/1     Running   0             2m11s   10.244.0.47   desktop-control-plane   <none>           <none>
+food-portal-green-6795d84db6-tz2md   0/1     Running   1 (31s ago)   61s     10.244.0.49   desktop-control-plane   <none>           <none>
+food-portal-green-6cd476b456-64swx   1/1     Running   0             4m27s   10.244.0.35   desktop-control-plane   <none>           <none>
+food-portal-green-6cd476b456-bvrp2   1/1     Running   0             4m27s   10.244.0.33   desktop-control-plane   <none>           <none>
+food-portal-green-6cd476b456-n764t   1/1     Running   0             4m27s   10.244.0.34   desktop-control-plane   <none>           <none>
+
+Traceback (most recent call last):
+  File "C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food\scripts\ci.py", line 140, in <module>
+    try:globals()[stage]()
+        ~~~~~~~~~~~~~~~~^^
+  File "C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food\scripts\ci.py", line 97, in deploy
+    if result:raise RuntimeError("Candidate failed readiness; automatic rollback required")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Candidate failed readiness; automatic rollback required
+[Pipeline] catchError
+[Pipeline] {
+[Pipeline] error
+[Pipeline] }
+ERROR: Readiness rejected the candidate release.
+Setting overall build result to FAILURE
+[Pipeline] // catchError
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Automatic Rollback)
+[Pipeline] withCredentials
+Masking supported pattern matches of %KUBECONFIG%
+[Pipeline] {
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food>python scripts/ci.py rollback 
++ kubectl --context docker-desktop -n assessment9 get service food-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"food-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30082,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"food-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "food-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "5743",
+        "uid": "4562796b-1450-454f-9ac2-8fe2757f298e"
+    },
+    "spec": {
+        "clusterIP": "10.96.79.197",
+        "clusterIPs": [
+            "10.96.79.197"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30082,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "food-portal",
+            "slot": "blue"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
++ kubectl --context docker-desktop -n assessment9 set image deployment/food-portal-green food-portal=pdgamersg/assessment9-food:v1-3
+deployment.apps/food-portal-green image updated
+
++ kubectl --context docker-desktop -n assessment9 rollout status deployment/food-portal-green --timeout=120s
+deployment "food-portal-green" successfully rolled out
+
+deployment "food-portal-green" successfully rolled out
+
+PASS: previous stable release restored automatically
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Verify NodePort and Pods)
+[Pipeline] withCredentials
+Masking supported pattern matches of %KUBECONFIG%
+[Pipeline] {
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food>python scripts/ci.py verify 
++ kubectl --context docker-desktop -n assessment9 get service food-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"food-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30082,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"food-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "food-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "5743",
+        "uid": "4562796b-1450-454f-9ac2-8fe2757f298e"
+    },
+    "spec": {
+        "clusterIP": "10.96.79.197",
+        "clusterIPs": [
+            "10.96.79.197"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30082,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "food-portal",
+            "slot": "blue"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
++ kubectl --context docker-desktop -n assessment9 get pods -l app=food-portal,slot=blue -o json
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-15T16:16:44Z",
+                "generateName": "food-portal-blue-6647dc7f85-",
+                "generation": 1,
+                "labels": {
+                    "app": "food-portal",
+                    "pod-template-hash": "6647dc7f85",
+                    "slot": "blue"
+                },
+                "name": "food-portal-blue-6647dc7f85-6b54t",
+                "namespace": "assessment9",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "food-portal-blue-6647dc7f85",
+                        "uid": "3d66291f-37cd-4c16-a130-754197689274"
+                    }
+                ],
+                "resourceVersion": "6040",
+                "uid": "64565f72-354e-4ee8-8d18-caf4ad954c52"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-food:v2-4",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "food-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-fkvp5",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "desktop-control-plane",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "kube-api-access-fkvp5",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "10m",
+                    "memory": "16Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:45Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:49Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:49Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "16Mi"
+                        },
+                        "containerID": "containerd://da762864bfa8a31b9b4a96cf8769c612d23138e5958aba3180094ada272c9560",
+                        "image": "docker.io/pdgamersg/assessment9-food:v1-3",
+                        "imageID": "docker.io/pdgamersg/assessment9-food@sha256:6ee6159fe9100b03b1952688a9f4d99a8420aa7dffe4772c07c90e2a5cdd91a2",
+                        "lastState": {},
+                        "name": "food-portal",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-15T16:16:45Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    6,
+                                    10,
+                                    11,
+                                    20,
+                                    26,
+                                    27
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-fkvp5",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.2",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.0.45",
+                "podIPs": [
+                    {
+                        "ip": "10.244.0.45"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "250m",
+                        "memory": "64Mi"
+                    },
+                    "requests": {
+                        "memory": "16Mi"
+                    }
+                },
+                "startTime": "2026-10-15T16:16:44Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-15T16:16:49Z",
+                "generateName": "food-portal-blue-6647dc7f85-",
+                "generation": 1,
+                "labels": {
+                    "app": "food-portal",
+                    "pod-template-hash": "6647dc7f85",
+                    "slot": "blue"
+                },
+                "name": "food-portal-blue-6647dc7f85-7xckb",
+                "namespace": "assessment9",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "food-portal-blue-6647dc7f85",
+                        "uid": "3d66291f-37cd-4c16-a130-754197689274"
+                    }
+                ],
+                "resourceVersion": "5912",
+                "uid": "cf55967b-0600-4fb3-80cd-89900c798176"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-food:v2-4",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "food-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-nzhbq",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "desktop-control-plane",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "kube-api-access-nzhbq",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "10m",
+                    "memory": "16Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:49Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:49Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:54Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:54Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:49Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "16Mi"
+                        },
+                        "containerID": "containerd://a4c81b5cf71e6ff81ddeb86ad5d5b93cf71e236747181b3ff7ab61dfa2b99298",
+                        "image": "docker.io/pdgamersg/assessment9-food:v1-3",
+                        "imageID": "docker.io/pdgamersg/assessment9-food@sha256:6ee6159fe9100b03b1952688a9f4d99a8420aa7dffe4772c07c90e2a5cdd91a2",
+                        "lastState": {},
+                        "name": "food-portal",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-15T16:16:50Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    6,
+                                    10,
+                                    11,
+                                    20,
+                                    26,
+                                    27
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-nzhbq",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.2",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.0.46",
+                "podIPs": [
+                    {
+                        "ip": "10.244.0.46"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "250m",
+                        "memory": "64Mi"
+                    },
+                    "requests": {
+                        "memory": "16Mi"
+                    }
+                },
+                "startTime": "2026-10-15T16:16:49Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-15T16:16:54Z",
+                "generateName": "food-portal-blue-6647dc7f85-",
+                "generation": 1,
+                "labels": {
+                    "app": "food-portal",
+                    "pod-template-hash": "6647dc7f85",
+                    "slot": "blue"
+                },
+                "name": "food-portal-blue-6647dc7f85-fl8m9",
+                "namespace": "assessment9",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "food-portal-blue-6647dc7f85",
+                        "uid": "3d66291f-37cd-4c16-a130-754197689274"
+                    }
+                ],
+                "resourceVersion": "5917",
+                "uid": "b959352a-9889-4e97-aad2-765c982eb701"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-food:v2-4",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "food-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-cx5hr",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "desktop-control-plane",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "kube-api-access-cx5hr",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "10m",
+                    "memory": "16Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:55Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:54Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:16:54Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "16Mi"
+                        },
+                        "containerID": "containerd://a79c14a5500897152c72328c1a07a83896217209577dbd01c4ff6df481f40805",
+                        "image": "docker.io/pdgamersg/assessment9-food:v1-3",
+                        "imageID": "docker.io/pdgamersg/assessment9-food@sha256:6ee6159fe9100b03b1952688a9f4d99a8420aa7dffe4772c07c90e2a5cdd91a2",
+                        "lastState": {},
+                        "name": "food-portal",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-15T16:16:55Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    6,
+                                    10,
+                                    11,
+                                    20,
+                                    26,
+                                    27
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-cx5hr",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.2",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.0.47",
+                "podIPs": [
+                    {
+                        "ip": "10.244.0.47"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "250m",
+                        "memory": "64Mi"
+                    },
+                    "requests": {
+                        "memory": "16Mi"
+                    }
+                },
+                "startTime": "2026-10-15T16:16:54Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
++ kubectl --context docker-desktop -n assessment9 get deployments
+NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+food-portal-blue    3/3     3            3           8m41s
+food-portal-green   3/3     3            3           4m36s
+hospital-portal     3/3     3            3           30m
+lms-portal          2/2     2            2           30m
+
++ kubectl --context docker-desktop -n assessment9 get pods -l app=food-portal,slot=blue -o wide
+NAME                                READY   STATUS    RESTARTS   AGE     IP            NODE                    NOMINATED NODE   READINESS GATES
+food-portal-blue-6647dc7f85-6b54t   1/1     Running   0          2m30s   10.244.0.45   desktop-control-plane   <none>           <none>
+food-portal-blue-6647dc7f85-7xckb   1/1     Running   0          2m25s   10.244.0.46   desktop-control-plane   <none>           <none>
+food-portal-blue-6647dc7f85-fl8m9   1/1     Running   0          2m20s   10.244.0.47   desktop-control-plane   <none>           <none>
+
++ kubectl --context docker-desktop -n assessment9 get service food-portal -o wide
+NAME          TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+food-portal   NodePort   10.96.79.197   <none>        80:30082/TCP   30m   app=food-portal,slot=blue
+
++ docker ps -a --filter name=^/assessment9-food-nodeport$ --format {{.Names}}
+assessment9-food-nodeport
+
++ docker start assessment9-food-nodeport
+assessment9-food-nodeport
+
+PASS: NodePort 30082 HTTP 200; 3 Running/Ready serving Pods; HTML matches Git source.
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] archiveArtifacts
+Archiving artifacts
+Recording fingerprints
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q2-Food>python scripts/ci.py cleanup 
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: FAILURE

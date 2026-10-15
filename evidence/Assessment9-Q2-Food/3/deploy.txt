@@ -1,0 +1,80 @@
+$ kubectl --context docker-desktop apply -f k8s/namespace.yaml
+namespace/assessment9 unchanged
+
+$ kubectl --context docker-desktop -n assessment9 get service food-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"food-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30082,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"food-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "food-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "4423",
+        "uid": "4562796b-1450-454f-9ac2-8fe2757f298e"
+    },
+    "spec": {
+        "clusterIP": "10.96.79.197",
+        "clusterIPs": [
+            "10.96.79.197"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30082,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "food-portal",
+            "slot": "blue"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
+$ kubectl --context docker-desktop -n assessment9 get deployment food-portal-green -o json
+Error from server (NotFound): deployments.apps "food-portal-green" not found
+
+$ kubectl --context docker-desktop -n assessment9 apply -f evidence\candidate.yaml
+deployment.apps/food-portal-green created
+
+$ kubectl --context docker-desktop -n assessment9 rollout status deployment/food-portal-green --timeout=75s
+Waiting for deployment "food-portal-green" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "food-portal-green" rollout to finish: 1 of 3 updated replicas are available...
+Waiting for deployment "food-portal-green" rollout to finish: 2 of 3 updated replicas are available...
+deployment "food-portal-green" successfully rolled out
+
+$ kubectl --context docker-desktop -n assessment9 get pods -l app=food-portal -o wide
+NAME                                 READY   STATUS    RESTARTS   AGE     IP            NODE                    NOMINATED NODE   READINESS GATES
+food-portal-blue-6fd9dd46db-56d5s    1/1     Running   0          4m10s   10.244.0.26   desktop-control-plane   <none>           <none>
+food-portal-blue-6fd9dd46db-8xbcr    1/1     Running   0          4m10s   10.244.0.27   desktop-control-plane   <none>           <none>
+food-portal-blue-6fd9dd46db-ld9hb    1/1     Running   0          4m10s   10.244.0.25   desktop-control-plane   <none>           <none>
+food-portal-green-6cd476b456-64swx   1/1     Running   0          5s      10.244.0.35   desktop-control-plane   <none>           <none>
+food-portal-green-6cd476b456-bvrp2   1/1     Running   0          5s      10.244.0.33   desktop-control-plane   <none>           <none>
+food-portal-green-6cd476b456-n764t   1/1     Running   0          5s      10.244.0.34   desktop-control-plane   <none>           <none>
+
+$ kubectl --context docker-desktop -n assessment9 patch service food-portal --type=merge -p {"spec": {"selector": {"app": "food-portal", "slot": "green"}}}
+service/food-portal patched
+
+BLUE-GREEN PROMOTION: healthy green receives production traffic
+$ kubectl --context docker-desktop -n assessment9 delete deployment food-portal --ignore-not-found=true
+
+$ docker ps -a --filter name=^/assessment9-food-nodeport$ --format {{.Names}}
+assessment9-food-nodeport
+
+$ docker start assessment9-food-nodeport
+assessment9-food-nodeport

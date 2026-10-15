@@ -1,0 +1,44 @@
+$ docker build -t pdgamersg/assessment9-hospital:broken-5 hospital-portal
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 253B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/nginx:1.27-alpine
+#2 ...
+
+#3 [auth] library/nginx:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/nginx:1.27-alpine
+#2 DONE 1.8s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 84B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 5.85kB done
+#5 DONE 0.0s
+
+#6 [1/3] FROM docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+#6 resolve docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 0.0s done
+#6 DONE 0.0s
+
+#7 [2/3] COPY nginx.conf /etc/nginx/conf.d/default.conf
+#7 CACHED
+
+#8 [3/3] COPY . /usr/share/nginx/html/
+#8 DONE 0.1s
+
+#9 exporting to image
+#9 exporting layers 0.1s done
+#9 exporting manifest sha256:57c32c86663b2ca27652ae51bb153d79d32237f96c9a6e64348964f2776c66e8 0.0s done
+#9 exporting config sha256:ae827b47921db1f929b686a19c7d02720339dc9c209a3f626a0b461b14c7a9d6
+#9 exporting config sha256:ae827b47921db1f929b686a19c7d02720339dc9c209a3f626a0b461b14c7a9d6 0.0s done
+#9 exporting attestation manifest sha256:e3673bf366649352d3023da3a384f6e7cfa10f6d4cdddcd13f23eeddfc05bd63 0.0s done
+#9 exporting manifest list sha256:2fc60b5d0dadf7dbb0be56b06aca49e9ba5071047ffc66793587dda9e99a8f90 0.0s done
+#9 naming to docker.io/pdgamersg/assessment9-hospital:broken-5 done
+#9 unpacking to docker.io/pdgamersg/assessment9-hospital:broken-5 0.0s done
+#9 DONE 0.3s

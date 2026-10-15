@@ -1,0 +1,132 @@
+{
+  "_links": {
+    "self": {
+      "href": "/job/Assessment9-Q2-Food/5/wfapi/describe"
+    },
+    "artifacts": {
+      "href": "/job/Assessment9-Q2-Food/5/wfapi/artifacts"
+    }
+  },
+  "id": "5",
+  "name": "#5",
+  "status": "FAILED",
+  "startTimeMillis": 1792081061692,
+  "endTimeMillis": 1792081156007,
+  "durationMillis": 94315,
+  "queueDurationMillis": 7,
+  "pauseDurationMillis": 0,
+  "stages": [
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q2-Food/5/execution/node/10/wfapi/describe"
+        }
+      },
+      "id": "10",
+      "name": "Clone Code",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792081064959,
+      "durationMillis": 1428,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q2-Food/5/execution/node/15/wfapi/describe"
+        }
+      },
+      "id": "15",
+      "name": "Build Docker Image",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792081066408,
+      "durationMillis": 4542,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q2-Food/5/execution/node/20/wfapi/describe"
+        }
+      },
+      "id": "20",
+      "name": "Test Application",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792081070980,
+      "durationMillis": 2726,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q2-Food/5/execution/node/25/wfapi/describe"
+        }
+      },
+      "id": "25",
+      "name": "Push Image",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792081073737,
+      "durationMillis": 9555,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q2-Food/5/execution/node/34/wfapi/describe"
+        }
+      },
+      "id": "34",
+      "name": "Deploy to Kubernetes",
+      "execNode": "",
+      "status": "FAILED",
+      "startTimeMillis": 1792081083311,
+      "durationMillis": 69246,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q2-Food/5/execution/node/52/wfapi/describe"
+        }
+      },
+      "id": "52",
+      "name": "Automatic Rollback",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792081152588,
+      "durationMillis": 1351,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q2-Food/5/execution/node/61/wfapi/describe"
+        }
+      },
+      "id": "61",
+      "name": "Verify NodePort and Pods",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792081153960,
+      "durationMillis": 1450,
+      "pauseDurationMillis": 0
+    },
+    {
+      "_links": {
+        "self": {
+          "href": "/job/Assessment9-Q2-Food/5/execution/node/70/wfapi/describe"
+        }
+      },
+      "id": "70",
+      "name": "Declarative: Post Actions",
+      "execNode": "",
+      "status": "SUCCESS",
+      "startTimeMillis": 1792081155426,
+      "durationMillis": 412,
+      "pauseDurationMillis": 0
+    }
+  ]
+}

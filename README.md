@@ -1,6 +1,8 @@
-# Assessment 9 ? Reliable portal delivery
+# Assessment 9 - Reliable portal delivery
 
 One repository for all three questions of ISWE406P. The supplied PDF is headed Assessment VIII.
+
+Completed assignment: [Word document](report/DA%209.docx) and [PDF](report/DA%209.pdf), with 34 reviewed pages and 49 embedded images. The cover, body typography, border and Question/Step structure follow the supplied DA 8 reference.
 
 | Question | Application | Replicas | NodePort | Release strategy |
 |---|---|---:|---:|---|
@@ -12,11 +14,19 @@ Each application contains index.html, Dockerfile, nginx.conf, deployment.yaml an
 
 ## Jenkins
 
-The Windows Jenkins job Assessment9-Portals loads the root Jenkinsfile from this repository. APP selects the portal; RELEASE supplies a version prefix; FAULTY=true intentionally builds an image whose /healthz endpoint returns HTTP 503. Normal builds test HTTP content against the Git source, validate Nginx, publish a unique Docker Hub image tag, deploy, wait for readiness and check the NodePort and serving Pods.
+Three Windows Jenkins jobs load the corresponding application Jenkinsfile from this one repository:
+
+| Job | Script path |
+|---|---|
+| Assessment9-Q1-LMS | lms-portal/Jenkinsfile |
+| Assessment9-Q2-Food | food-portal/Jenkinsfile |
+| Assessment9-Q3-Hospital | hospital-portal/Jenkinsfile |
+
+APP selects the portal; RELEASE supplies a version prefix; FAULTY=true intentionally builds an image whose /healthz endpoint returns HTTP 503. Normal builds test HTTP content against the Git source, validate Nginx, publish a unique Docker Hub image tag, deploy, wait for readiness and check the NodePort and serving Pods. The root Jenkinsfile is also available as a generic parameterised pipeline.
 
 Credentials remain in Jenkins: dockerhub (existing Docker Hub account) and assessment9-kubeconfig (secret kubeconfig file). No credentials or kubeconfig are committed. Docker login uses standard input and an isolated per-workspace config which is removed afterward.
 
-The pipeline polls GitHub every two minutes. Each poll detects committed source changes; use APP to build the corresponding portal. scripts/ci.py performs the Windows CI stages. To run a stage locally, set APP, RELEASE and BUILD_NUMBER before calling python scripts/ci.py build (then test, push, deploy and verify). Push requires DOCKER_USER and DOCKER_PASS supplied through Jenkins credentials.
+Each pipeline polls GitHub every two minutes and automatically builds committed changes. Its default APP selects its own portal. scripts/ci.py performs the Windows CI stages. To run a stage locally, set APP, RELEASE and BUILD_NUMBER before calling python scripts/ci.py build (then test, push, deploy and verify). Push requires DOCKER_USER and DOCKER_PASS supplied through Jenkins credentials. Kubernetes stages need a valid kubeconfig and the docker-desktop context.
 
 ## Deployment and failure handling
 
@@ -30,4 +40,10 @@ Docker Desktop uses a kind-backed Kubernetes node on this machine. Small Node.js
 
 The food portal update adds a thank-you message and restaurant rating summary. The hospital portal update adds a vaccination clinic and appointment slots. The Q3 prompt refers to a placement webpage despite specifying a hospital portal; the update is applied to the hospital scenario consistently.
 
-Actual build results, image digests, Pod output and screenshots are saved in evidence/ and screenshots/ after verification.
+Actual build results, image digests, Pod output and screenshots are saved in evidence/ and screenshots/. See [verified results](evidence/RESULTS.md): build #3 was triggered automatically by SCM, #4 delivered the stable release, and #5 intentionally failed readiness and recovered successfully in all three jobs. Stage metadata, SCM causes and original archived output are retained.
+
+## Running locally
+
+Enable Docker Desktop Kubernetes and select its docker-desktop context. Create the namespace with `kubectl apply -f k8s/namespace.yaml`. Configure the two Jenkins credentials above, then create each Pipeline from SCM job with this repository's main branch and the script path in the table. Run each job once with FAULTY=false to establish a stable release. Source changes then trigger SCM builds automatically. Run FAULTY=true with RELEASE=broken to reproduce the rejected candidate and automatic recovery. A first-ever faulty deployment cannot roll back to a stable release that does not yet exist.
+
+The food manifest defines blue; the pipeline creates or updates green from the same template and switches only the Service slot selector. Both colours retain three Pods; production has three serving Pods.

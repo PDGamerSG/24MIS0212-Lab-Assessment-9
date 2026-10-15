@@ -1,0 +1,1704 @@
+Started by an SCM change
+Obtained hospital-portal/Jenkinsfile from git https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-9.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Still waiting to schedule task
+Waiting for next available executor
+Running on Jenkins in C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q3-Hospital
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] timeout
+Timeout set to expire in 20 min
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Clone Code)
+[Pipeline] git
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git.exe rev-parse --resolve-git-dir C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q3-Hospital\.git # timeout=10
+Fetching changes from the remote Git repository
+ > git.exe config remote.origin.url https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-9.git # timeout=10
+Fetching upstream changes from https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-9.git
+ > git.exe --version # timeout=10
+ > git --version # 'git version 2.53.0.windows.2'
+ > git.exe fetch --tags --force --progress -- https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-9.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git.exe rev-parse "refs/remotes/origin/main^{commit}" # timeout=10
+Checking out Revision 1a74934c7e65a70ae1f743ad771c1b76df7229f4 (refs/remotes/origin/main)
+ > git.exe config core.sparsecheckout # timeout=10
+ > git.exe checkout -f 1a74934c7e65a70ae1f743ad771c1b76df7229f4 # timeout=10
+ > git.exe branch -a -v --no-abbrev # timeout=10
+ > git.exe branch -D main # timeout=10
+ > git.exe checkout -b main 1a74934c7e65a70ae1f743ad771c1b76df7229f4 # timeout=10
+Commit message: "Publish stable release aliases and simplify the verified rollout implementation"
+ > git.exe rev-list --no-walk 27690f1dfe0b1ddca60835e60cf159638ca84dc2 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Docker Image)
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q3-Hospital>python scripts/ci.py build 
++ docker build -t pdgamersg/assessment9-hospital:v1-3 hospital-portal
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 253B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/nginx:1.27-alpine
+#2 ...
+
+#3 [auth] library/nginx:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/nginx:1.27-alpine
+#2 DONE 1.8s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 84B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 5.82kB done
+#5 DONE 0.0s
+
+#6 [1/3] FROM docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+#6 resolve docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 0.0s done
+#6 DONE 0.0s
+
+#7 [2/3] COPY nginx.conf /etc/nginx/conf.d/default.conf
+#7 CACHED
+
+#8 [3/3] COPY . /usr/share/nginx/html/
+#8 DONE 0.0s
+
+#9 exporting to image
+#9 exporting layers 0.1s done
+#9 exporting manifest sha256:d136ea6e288c39ca8a70ce1486ce6eaaa498a01d0908836f11fee0746e78ff69 0.0s done
+#9 exporting config sha256:f3a7029146b6218281dae9033e89f8c0286be5c96ba6b3235387fe73fd9d3a70 0.0s done
+#9 exporting attestation manifest sha256:d8116035de5b7f2df8ef0f5faafff287b127d99921836287098d6843e7c96f10 0.0s done
+#9 exporting manifest list sha256:2bd3d16e7df43eb920d4436239a5ef9cd74bce3bad4a7be068aea0d90e31b4ac 0.0s done
+#9 naming to docker.io/pdgamersg/assessment9-hospital:v1-3 done
+#9 unpacking to docker.io/pdgamersg/assessment9-hospital:v1-3 0.0s done
+#9 DONE 0.3s
+
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Test Application)
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q3-Hospital>python scripts/ci.py test 
++ docker run -d --name assessment9-smoke-hospital-3 --restart no -p 127.0.0.1:8193:80 pdgamersg/assessment9-hospital:v1-3
+57f2a98ec8100084cc6751d29518b456f8fc0f6802ae36234174beb2152051b5
+
++ docker exec assessment9-smoke-hospital-3 nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+PASS: HTTP 200, valid nginx config, source SHA-256 0c76120344a35b917c4921dab009ed35108753c29010595a2a88191def9933b8
++ docker rm -f assessment9-smoke-hospital-3
+assessment9-smoke-hospital-3
+
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Push Image)
+[Pipeline] withCredentials
+Masking supported pattern matches of %DOCKER_PASS%
+[Pipeline] {
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q3-Hospital>python scripts/ci.py push 
+Docker Hub login: successful
++ docker push pdgamersg/assessment9-hospital:v1-3
+The push refers to repository [docker.io/pdgamersg/assessment9-hospital]
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+b464cfdf2a63: Layer already exists
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Layer already exists
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+197eb75867ef: Waiting
+949819bddb13: Waiting
+f18232174bc9: Waiting
+34a64644b756: Waiting
+61ca4f733c80: Waiting
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Waiting
+197eb75867ef: Waiting
+949819bddb13: Waiting
+f18232174bc9: Layer already exists
+34a64644b756: Waiting
+61ca4f733c80: Layer already exists
+81bd8ed7ec67: Waiting
+39c2ddfd6010: Layer already exists
+f439805f3f0d: Waiting
+d7e507024086: Waiting
+949819bddb13: Waiting
+34a64644b756: Layer already exists
+81bd8ed7ec67: Waiting
+f439805f3f0d: Waiting
+d7e507024086: Layer already exists
+197eb75867ef: Layer already exists
+81bd8ed7ec67: Waiting
+f439805f3f0d: Waiting
+81bd8ed7ec67: Waiting
+f439805f3f0d: Waiting
+81bd8ed7ec67: Layer already exists
+f439805f3f0d: Waiting
+949819bddb13: Pushed
+f439805f3f0d: Pushed
+v1-3: digest: sha256:2bd3d16e7df43eb920d4436239a5ef9cd74bce3bad4a7be068aea0d90e31b4ac size: 856
+
++ docker tag pdgamersg/assessment9-hospital:v1-3 pdgamersg/assessment9-hospital:v1
+
++ docker push pdgamersg/assessment9-hospital:v1
+The push refers to repository [docker.io/pdgamersg/assessment9-hospital]
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+34a64644b756: Layer already exists
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+197eb75867ef: Waiting
+39c2ddfd6010: Layer already exists
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Waiting
+f439805f3f0d: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+d7e507024086: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+f18232174bc9: Waiting
+d7e507024086: Layer already exists
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Waiting
+949819bddb13: Already exists
+f439805f3f0d: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Waiting
+81bd8ed7ec67: Waiting
+b464cfdf2a63: Layer already exists
+f439805f3f0d: Waiting
+197eb75867ef: Waiting
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f439805f3f0d: Layer already exists
+197eb75867ef: Layer already exists
+01b0f2948a2d: Waiting
+61ca4f733c80: Waiting
+f18232174bc9: Layer already exists
+81bd8ed7ec67: Waiting
+81bd8ed7ec67: Layer already exists
+01b0f2948a2d: Layer already exists
+61ca4f733c80: Layer already exists
+v1: digest: sha256:2bd3d16e7df43eb920d4436239a5ef9cd74bce3bad4a7be068aea0d90e31b4ac size: 856
+
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy to Kubernetes)
+[Pipeline] withCredentials
+Masking supported pattern matches of %KUBECONFIG%
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q3-Hospital>python scripts/ci.py deploy 
++ kubectl --context docker-desktop apply -f k8s/namespace.yaml
+namespace/assessment9 unchanged
+
++ kubectl --context docker-desktop -n assessment9 get service hospital-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"hospital-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30083,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"hospital-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "hospital-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "1479",
+        "uid": "02f6cde5-2ee6-45e2-af9e-067c0bc4aaf6"
+    },
+    "spec": {
+        "clusterIP": "10.96.20.202",
+        "clusterIPs": [
+            "10.96.20.202"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30083,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "hospital-portal"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
++ kubectl --context docker-desktop -n assessment9 get deployment hospital-portal -o json
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "8",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"hospital-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"progressDeadlineSeconds\":60,\"replicas\":3,\"revisionHistoryLimit\":5,\"selector\":{\"matchLabels\":{\"app\":\"hospital-portal\"}},\"strategy\":{\"rollingUpdate\":{\"maxSurge\":1,\"maxUnavailable\":0},\"type\":\"RollingUpdate\"},\"template\":{\"metadata\":{\"labels\":{\"app\":\"hospital-portal\"}},\"spec\":{\"containers\":[{\"image\":\"pdgamersg/assessment9-hospital:v1-2\",\"imagePullPolicy\":\"IfNotPresent\",\"livenessProbe\":{\"httpGet\":{\"path\":\"/healthz\",\"port\":80},\"initialDelaySeconds\":5,\"periodSeconds\":10},\"name\":\"hospital-portal\",\"ports\":[{\"containerPort\":80}],\"readinessProbe\":{\"httpGet\":{\"path\":\"/healthz\",\"port\":80},\"initialDelaySeconds\":2,\"periodSeconds\":3},\"resources\":{\"limits\":{\"cpu\":\"250m\",\"memory\":\"64Mi\"},\"requests\":{\"cpu\":\"10m\",\"memory\":\"16Mi\"}}}]}}}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:41Z",
+        "generation": 8,
+        "name": "hospital-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "4518",
+        "uid": "c87880dd-f3ef-4893-bd39-07a1acd6731a"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 60,
+        "replicas": 3,
+        "revisionHistoryLimit": 5,
+        "selector": {
+            "matchLabels": {
+                "app": "hospital-portal"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": 1,
+                "maxUnavailable": 0
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "hospital-portal"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-hospital:v1-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "hospital-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 3,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-15T15:48:48Z",
+                "lastUpdateTime": "2026-10-15T15:48:48Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-10-15T15:48:41Z",
+                "lastUpdateTime": "2026-10-15T16:10:46Z",
+                "message": "ReplicaSet \"hospital-portal-59788869cd\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 8,
+        "readyReplicas": 3,
+        "replicas": 3,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 3
+    }
+}
+
++ kubectl --context docker-desktop -n assessment9 apply -f evidence\candidate.yaml
+deployment.apps/hospital-portal configured
+
++ kubectl --context docker-desktop -n assessment9 rollout status deployment/hospital-portal --timeout=75s
+Waiting for deployment "hospital-portal" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "hospital-portal" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "hospital-portal" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "hospital-portal" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "hospital-portal" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "hospital-portal" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "hospital-portal" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "hospital-portal" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "hospital-portal" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "hospital-portal" rollout to finish: 1 old replicas are pending termination...
+deployment "hospital-portal" successfully rolled out
+
++ kubectl --context docker-desktop -n assessment9 get pods -l app=hospital-portal -o wide
+NAME                               READY   STATUS        RESTARTS   AGE     IP            NODE                    NOMINATED NODE   READINESS GATES
+hospital-portal-59788869cd-jn6wk   1/1     Terminating   0          4m53s   10.244.0.24   desktop-control-plane   <none>           <none>
+hospital-portal-6c9d94d6d9-4fpkv   1/1     Running       0          5s      10.244.0.39   desktop-control-plane   <none>           <none>
+hospital-portal-6c9d94d6d9-842kg   1/1     Running       0          10s     10.244.0.38   desktop-control-plane   <none>           <none>
+hospital-portal-6c9d94d6d9-lkblw   1/1     Running       0          15s     10.244.0.37   desktop-control-plane   <none>           <none>
+
++ docker ps -a --filter name=^/assessment9-hospital-nodeport$ --format {{.Names}}
+assessment9-hospital-nodeport
+
++ docker start assessment9-hospital-nodeport
+assessment9-hospital-nodeport
+
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Automatic Rollback)
+Stage "Automatic Rollback" skipped due to when conditional
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Verify NodePort and Pods)
+[Pipeline] withCredentials
+Masking supported pattern matches of %KUBECONFIG%
+[Pipeline] {
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q3-Hospital>python scripts/ci.py verify 
++ kubectl --context docker-desktop -n assessment9 get service hospital-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"hospital-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30083,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"hospital-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "hospital-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "1479",
+        "uid": "02f6cde5-2ee6-45e2-af9e-067c0bc4aaf6"
+    },
+    "spec": {
+        "clusterIP": "10.96.20.202",
+        "clusterIPs": [
+            "10.96.20.202"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30083,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "hospital-portal"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
++ kubectl --context docker-desktop -n assessment9 get pods -l app=hospital-portal -o json
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-15T16:15:19Z",
+                "generateName": "hospital-portal-6c9d94d6d9-",
+                "generation": 1,
+                "labels": {
+                    "app": "hospital-portal",
+                    "pod-template-hash": "6c9d94d6d9"
+                },
+                "name": "hospital-portal-6c9d94d6d9-4fpkv",
+                "namespace": "assessment9",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "hospital-portal-6c9d94d6d9",
+                        "uid": "c7b6f932-de0e-4060-8673-2531171e5606"
+                    }
+                ],
+                "resourceVersion": "5268",
+                "uid": "b2279303-81b1-4548-8b7a-5683cce8cf9c"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-hospital:v1-3",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "hospital-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-mzjpn",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "desktop-control-plane",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "kube-api-access-mzjpn",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "10m",
+                    "memory": "16Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:20Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:19Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:24Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:24Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:19Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "16Mi"
+                        },
+                        "containerID": "containerd://1b37495faf0b6621d0867bc03896b942ffffe005742933c1f7f52054b72bdacf",
+                        "image": "docker.io/pdgamersg/assessment9-hospital:v1-3",
+                        "imageID": "docker.io/pdgamersg/assessment9-hospital@sha256:2bd3d16e7df43eb920d4436239a5ef9cd74bce3bad4a7be068aea0d90e31b4ac",
+                        "lastState": {},
+                        "name": "hospital-portal",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-15T16:15:20Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    6,
+                                    10,
+                                    11,
+                                    20,
+                                    26,
+                                    27
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-mzjpn",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.2",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    },
+                    {
+                        "ip": "fc00:f853:ccd:e793::2"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.0.39",
+                "podIPs": [
+                    {
+                        "ip": "10.244.0.39"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "250m",
+                        "memory": "64Mi"
+                    },
+                    "requests": {
+                        "memory": "16Mi"
+                    }
+                },
+                "startTime": "2026-10-15T16:15:19Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-15T16:15:14Z",
+                "generateName": "hospital-portal-6c9d94d6d9-",
+                "generation": 1,
+                "labels": {
+                    "app": "hospital-portal",
+                    "pod-template-hash": "6c9d94d6d9"
+                },
+                "name": "hospital-portal-6c9d94d6d9-842kg",
+                "namespace": "assessment9",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "hospital-portal-6c9d94d6d9",
+                        "uid": "c7b6f932-de0e-4060-8673-2531171e5606"
+                    }
+                ],
+                "resourceVersion": "5220",
+                "uid": "713acbbd-8f2c-4ef0-a03e-457902c52c5c"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-hospital:v1-3",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "hospital-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-lpwpv",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "desktop-control-plane",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "kube-api-access-lpwpv",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "10m",
+                    "memory": "16Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:15Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:14Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:19Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:19Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:14Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "16Mi"
+                        },
+                        "containerID": "containerd://31781da072b4b11d0b666a39ecde370f846c2de61986631c3781c8b0e56c7a23",
+                        "image": "docker.io/pdgamersg/assessment9-hospital:v1-3",
+                        "imageID": "docker.io/pdgamersg/assessment9-hospital@sha256:2bd3d16e7df43eb920d4436239a5ef9cd74bce3bad4a7be068aea0d90e31b4ac",
+                        "lastState": {},
+                        "name": "hospital-portal",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-15T16:15:15Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    6,
+                                    10,
+                                    11,
+                                    20,
+                                    26,
+                                    27
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-lpwpv",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.2",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.0.38",
+                "podIPs": [
+                    {
+                        "ip": "10.244.0.38"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "250m",
+                        "memory": "64Mi"
+                    },
+                    "requests": {
+                        "memory": "16Mi"
+                    }
+                },
+                "startTime": "2026-10-15T16:15:14Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-15T16:15:09Z",
+                "generateName": "hospital-portal-6c9d94d6d9-",
+                "generation": 1,
+                "labels": {
+                    "app": "hospital-portal",
+                    "pod-template-hash": "6c9d94d6d9"
+                },
+                "name": "hospital-portal-6c9d94d6d9-lkblw",
+                "namespace": "assessment9",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "hospital-portal-6c9d94d6d9",
+                        "uid": "c7b6f932-de0e-4060-8673-2531171e5606"
+                    }
+                ],
+                "resourceVersion": "5171",
+                "uid": "9087c95a-becb-4925-9cf2-ad013a37cd8c"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-hospital:v1-3",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "hospital-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-fnzwl",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "desktop-control-plane",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "kube-api-access-fnzwl",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "10m",
+                    "memory": "16Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:10Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:09Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:14Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:14Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-15T16:15:09Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "16Mi"
+                        },
+                        "containerID": "containerd://a1f0c4c564d9f68c72ed17625f549d471e7ac8742991a5f768d5e7377cffc7af",
+                        "image": "docker.io/pdgamersg/assessment9-hospital:v1-3",
+                        "imageID": "docker.io/pdgamersg/assessment9-hospital@sha256:2bd3d16e7df43eb920d4436239a5ef9cd74bce3bad4a7be068aea0d90e31b4ac",
+                        "lastState": {},
+                        "name": "hospital-portal",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-15T16:15:10Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    6,
+                                    10,
+                                    11,
+                                    20,
+                                    26,
+                                    27
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-fnzwl",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.2",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.0.37",
+                "podIPs": [
+                    {
+                        "ip": "10.244.0.37"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "250m",
+                        "memory": "64Mi"
+                    },
+                    "requests": {
+                        "memory": "16Mi"
+                    }
+                },
+                "startTime": "2026-10-15T16:15:09Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
++ kubectl --context docker-desktop -n assessment9 get deployments
+NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+food-portal-blue    3/3     3            3           4m55s
+food-portal-green   3/3     3            3           50s
+hospital-portal     3/3     3            3           26m
+lms-portal          2/2     2            2           26m
+
++ kubectl --context docker-desktop -n assessment9 get pods -l app=hospital-portal -o wide
+NAME                               READY   STATUS    RESTARTS   AGE   IP            NODE                    NOMINATED NODE   READINESS GATES
+hospital-portal-6c9d94d6d9-4fpkv   1/1     Running   0          9s    10.244.0.39   desktop-control-plane   <none>           <none>
+hospital-portal-6c9d94d6d9-842kg   1/1     Running   0          14s   10.244.0.38   desktop-control-plane   <none>           <none>
+hospital-portal-6c9d94d6d9-lkblw   1/1     Running   0          19s   10.244.0.37   desktop-control-plane   <none>           <none>
+
++ kubectl --context docker-desktop -n assessment9 get service hospital-portal -o wide
+NAME              TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+hospital-portal   NodePort   10.96.20.202   <none>        80:30083/TCP   26m   app=hospital-portal
+
++ docker ps -a --filter name=^/assessment9-hospital-nodeport$ --format {{.Names}}
+assessment9-hospital-nodeport
+
++ docker start assessment9-hospital-nodeport
+assessment9-hospital-nodeport
+
+PASS: NodePort 30083 HTTP 200; 3 Running/Ready serving Pods; HTML matches Git source.
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] archiveArtifacts
+Archiving artifacts
+Recording fingerprints
+[Pipeline] bat
+
+C:\ProgramData\Jenkins\.jenkins\workspace\Assessment9-Q3-Hospital>python scripts/ci.py cleanup 
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS

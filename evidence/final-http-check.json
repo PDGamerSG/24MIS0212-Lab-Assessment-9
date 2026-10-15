@@ -1,0 +1,20 @@
+[
+  {
+    "application": "lms-portal",
+    "port": 30081,
+    "health": 200,
+    "html_matches_git": true
+  },
+  {
+    "application": "food-portal",
+    "port": 30082,
+    "health": 200,
+    "html_matches_git": true
+  },
+  {
+    "application": "hospital-portal",
+    "port": 30083,
+    "health": 200,
+    "html_matches_git": true
+  }
+]

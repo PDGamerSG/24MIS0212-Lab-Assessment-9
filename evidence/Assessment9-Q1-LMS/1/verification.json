@@ -1,0 +1,8 @@
+{
+  "url": "http://localhost:30081",
+  "replicas": 2,
+  "http_status": 200,
+  "sha256": "0b645117c5a64960a603b142fe17a469894fc692525b0d8dd15ac92cfd5c5855",
+  "candidate_image": "pdgamersg/assessment9-lms:v1-1",
+  "faulty_candidate_rejected": false
+}

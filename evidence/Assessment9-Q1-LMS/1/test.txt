@@ -1,0 +1,10 @@
+$ docker run -d --name assessment9-smoke-1 --restart no -p 127.0.0.1:8191:80 pdgamersg/assessment9-lms:v1-1
+9a9e6d4cac8eb1a857647f3df446d34bb5fe6aa6557ef1e28e105770b9b8dd7b
+
+$ docker exec assessment9-smoke-1 nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+PASS: HTTP 200, valid nginx config, source SHA-256 0b645117c5a64960a603b142fe17a469894fc692525b0d8dd15ac92cfd5c5855
+$ docker rm -f assessment9-smoke-1
+assessment9-smoke-1

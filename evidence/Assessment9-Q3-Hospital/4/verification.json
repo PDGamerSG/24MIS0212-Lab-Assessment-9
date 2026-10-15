@@ -1,0 +1,8 @@
+{
+  "url": "http://localhost:30083",
+  "replicas": 3,
+  "http_status": 200,
+  "sha256": "0c76120344a35b917c4921dab009ed35108753c29010595a2a88191def9933b8",
+  "candidate_image": "pdgamersg/assessment9-hospital:v2-4",
+  "faulty_candidate_rejected": false
+}

@@ -1,0 +1,184 @@
+$ kubectl --context docker-desktop apply -f k8s/namespace.yaml
+namespace/assessment9 unchanged
+
+$ kubectl --context docker-desktop -n assessment9 get service hospital-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"hospital-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30083,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"hospital-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "hospital-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "1479",
+        "uid": "02f6cde5-2ee6-45e2-af9e-067c0bc4aaf6"
+    },
+    "spec": {
+        "clusterIP": "10.96.20.202",
+        "clusterIPs": [
+            "10.96.20.202"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30083,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "hospital-portal"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
+$ kubectl --context docker-desktop -n assessment9 get deployment hospital-portal -o json
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "10",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"hospital-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"progressDeadlineSeconds\":60,\"replicas\":3,\"revisionHistoryLimit\":5,\"selector\":{\"matchLabels\":{\"app\":\"hospital-portal\"}},\"strategy\":{\"rollingUpdate\":{\"maxSurge\":1,\"maxUnavailable\":0},\"type\":\"RollingUpdate\"},\"template\":{\"metadata\":{\"labels\":{\"app\":\"hospital-portal\"}},\"spec\":{\"containers\":[{\"image\":\"pdgamersg/assessment9-hospital:v2-4\",\"imagePullPolicy\":\"IfNotPresent\",\"livenessProbe\":{\"httpGet\":{\"path\":\"/healthz\",\"port\":80},\"initialDelaySeconds\":5,\"periodSeconds\":10},\"name\":\"hospital-portal\",\"ports\":[{\"containerPort\":80}],\"readinessProbe\":{\"httpGet\":{\"path\":\"/healthz\",\"port\":80},\"initialDelaySeconds\":2,\"periodSeconds\":3},\"resources\":{\"limits\":{\"cpu\":\"250m\",\"memory\":\"64Mi\"},\"requests\":{\"cpu\":\"10m\",\"memory\":\"16Mi\"}}}]}}}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:41Z",
+        "generation": 10,
+        "name": "hospital-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "5585",
+        "uid": "c87880dd-f3ef-4893-bd39-07a1acd6731a"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 60,
+        "replicas": 3,
+        "revisionHistoryLimit": 5,
+        "selector": {
+            "matchLabels": {
+                "app": "hospital-portal"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": 1,
+                "maxUnavailable": 0
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "hospital-portal"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-hospital:v2-4",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "hospital-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 3,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-15T15:48:48Z",
+                "lastUpdateTime": "2026-10-15T15:48:48Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-10-15T15:48:41Z",
+                "lastUpdateTime": "2026-10-15T16:16:25Z",
+                "message": "ReplicaSet \"hospital-portal-86b9b78669\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 10,
+        "readyReplicas": 3,
+        "replicas": 3,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 3
+    }
+}
+
+$ kubectl --context docker-desktop -n assessment9 apply -f evidence\candidate.yaml
+deployment.apps/hospital-portal configured
+
+$ kubectl --context docker-desktop -n assessment9 rollout status deployment/hospital-portal --timeout=75s
+Waiting for deployment "hospital-portal" rollout to finish: 1 out of 3 new replicas have been updated...
+error: deployment "hospital-portal" exceeded its progress deadline
+
+$ kubectl --context docker-desktop -n assessment9 get pods -l app=hospital-portal -o wide
+NAME                               READY   STATUS    RESTARTS      AGE     IP            NODE                    NOMINATED NODE   READINESS GATES
+hospital-portal-7dc9fb56f9-dzj9p   0/1     Running   1 (30s ago)   61s     10.244.0.50   desktop-control-plane   <none>           <none>
+hospital-portal-86b9b78669-c2hll   1/1     Running   0             4m14s   10.244.0.44   desktop-control-plane   <none>           <none>
+hospital-portal-86b9b78669-jgpg2   1/1     Running   0             4m24s   10.244.0.40   desktop-control-plane   <none>           <none>
+hospital-portal-86b9b78669-vzd48   1/1     Running   0             4m20s   10.244.0.43   desktop-control-plane   <none>           <none>

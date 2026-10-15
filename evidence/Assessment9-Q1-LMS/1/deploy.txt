@@ -1,0 +1,184 @@
+$ kubectl --context docker-desktop apply -f k8s/namespace.yaml
+namespace/assessment9 unchanged
+
+$ kubectl --context docker-desktop -n assessment9 get service lms-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"lms-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30081,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"lms-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "lms-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "1485",
+        "uid": "9bc1bf3c-38be-43c0-b7c3-e25b98750848"
+    },
+    "spec": {
+        "clusterIP": "10.96.224.59",
+        "clusterIPs": [
+            "10.96.224.59"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30081,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "lms-portal"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
+$ kubectl --context docker-desktop -n assessment9 get deployment lms-portal -o json
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "7",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"lms-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"replicas\":2,\"revisionHistoryLimit\":3,\"selector\":{\"matchLabels\":{\"app\":\"lms-portal\"}},\"strategy\":{\"type\":\"RollingUpdate\"},\"template\":{\"metadata\":{\"labels\":{\"app\":\"lms-portal\"}},\"spec\":{\"containers\":[{\"image\":\"pdgamersg/assessment9-lms:stable\",\"livenessProbe\":{\"httpGet\":{\"path\":\"/\",\"port\":80},\"initialDelaySeconds\":5,\"periodSeconds\":10},\"name\":\"lms-portal\",\"ports\":[{\"containerPort\":80}],\"readinessProbe\":{\"httpGet\":{\"path\":\"/\",\"port\":80},\"initialDelaySeconds\":2,\"periodSeconds\":5}}]}}}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:41Z",
+        "generation": 7,
+        "name": "lms-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "2830",
+        "uid": "f9b96ddc-ee9c-46eb-9341-2d049db98ae6"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 2,
+        "revisionHistoryLimit": 3,
+        "selector": {
+            "matchLabels": {
+                "app": "lms-portal"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": "25%",
+                "maxUnavailable": "25%"
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "lms-portal"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-lms:stable",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "lms-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 2,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-15T15:48:47Z",
+                "lastUpdateTime": "2026-10-15T15:48:47Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-10-15T15:48:41Z",
+                "lastUpdateTime": "2026-10-15T15:56:37Z",
+                "message": "ReplicaSet \"lms-portal-5cf785c56d\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 7,
+        "readyReplicas": 2,
+        "replicas": 2,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 2
+    }
+}
+
+$ kubectl --context docker-desktop -n assessment9 apply -f evidence\candidate.yaml
+deployment.apps/lms-portal configured
+
+$ kubectl --context docker-desktop -n assessment9 rollout status deployment/lms-portal --timeout=75s
+Waiting for deployment "lms-portal" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "lms-portal" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "lms-portal" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "lms-portal" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "lms-portal" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "lms-portal" rollout to finish: 1 old replicas are pending termination...
+deployment "lms-portal" successfully rolled out
+
+$ kubectl --context docker-desktop -n assessment9 get pods -l app=lms-portal -o wide
+NAME                          READY   STATUS        RESTARTS   AGE   IP            NODE                    NOMINATED NODE   READINESS GATES
+lms-portal-5b9958d8d7-bkjlb   1/1     Running       0          5s    10.244.0.23   desktop-control-plane   <none>           <none>
+lms-portal-5b9958d8d7-tppdm   1/1     Running       0          10s   10.244.0.22   desktop-control-plane   <none>           <none>
+lms-portal-5cf785c56d-mc726   1/1     Terminating   0          20m   10.244.0.9    desktop-control-plane   <none>           <none>
+
+$ docker ps -a --filter name=^/assessment9-lms-nodeport$ --format {{.Names}}
+
+$ docker run -d --name assessment9-lms-nodeport --restart no --network kind -p 127.0.0.1:30081:30081 -e NODE_PORT=30081 node:22-alpine node -e const net=require('net');const p=Number(process.env.NODE_PORT);net.createServer(c=>{const u=net.connect(p,'desktop-control-plane');c.pipe(u).pipe(c);c.on('error',()=>u.destroy());u.on('error',()=>c.destroy());c.on('close',()=>u.destroy());}).listen(p,'0.0.0.0');
+e8f8aa4fba21a1355e18f4847b9a2fc17183bb29021e25617f0d7d825220f6dc

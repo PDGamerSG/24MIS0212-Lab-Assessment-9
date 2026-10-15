@@ -2,3 +2,4 @@
 *.png binary
 *.docx binary
 *.pdf binary
+evidence/**/*.txt -whitespace

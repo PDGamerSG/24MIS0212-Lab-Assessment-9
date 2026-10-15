@@ -1,0 +1,211 @@
+$ kubectl --context docker-desktop apply -f k8s/namespace.yaml
+namespace/assessment9 unchanged
+
+$ kubectl --context docker-desktop -n assessment9 get service food-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"food-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30082,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"food-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "food-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "5074",
+        "uid": "4562796b-1450-454f-9ac2-8fe2757f298e"
+    },
+    "spec": {
+        "clusterIP": "10.96.79.197",
+        "clusterIPs": [
+            "10.96.79.197"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30082,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "food-portal",
+            "slot": "green"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
+$ kubectl --context docker-desktop -n assessment9 get deployment food-portal-blue -o json
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "1",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"food-portal-blue\",\"namespace\":\"assessment9\"},\"spec\":{\"progressDeadlineSeconds\":60,\"replicas\":3,\"revisionHistoryLimit\":5,\"selector\":{\"matchLabels\":{\"app\":\"food-portal\",\"slot\":\"blue\"}},\"strategy\":{\"rollingUpdate\":{\"maxSurge\":1,\"maxUnavailable\":0},\"type\":\"RollingUpdate\"},\"template\":{\"metadata\":{\"labels\":{\"app\":\"food-portal\",\"slot\":\"blue\"}},\"spec\":{\"containers\":[{\"image\":\"pdgamersg/assessment9-food:v1-2\",\"imagePullPolicy\":\"IfNotPresent\",\"livenessProbe\":{\"httpGet\":{\"path\":\"/healthz\",\"port\":80},\"initialDelaySeconds\":5,\"periodSeconds\":10},\"name\":\"food-portal\",\"ports\":[{\"containerPort\":80}],\"readinessProbe\":{\"httpGet\":{\"path\":\"/healthz\",\"port\":80},\"initialDelaySeconds\":2,\"periodSeconds\":3},\"resources\":{\"limits\":{\"cpu\":\"250m\",\"memory\":\"64Mi\"},\"requests\":{\"cpu\":\"10m\",\"memory\":\"16Mi\"}}}]}}}}\n"
+        },
+        "creationTimestamp": "2026-10-15T16:10:33Z",
+        "generation": 1,
+        "name": "food-portal-blue",
+        "namespace": "assessment9",
+        "resourceVersion": "4419",
+        "uid": "4af5998a-2b60-4bb4-a2de-68df4a55618d"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 60,
+        "replicas": 3,
+        "revisionHistoryLimit": 5,
+        "selector": {
+            "matchLabels": {
+                "app": "food-portal",
+                "slot": "blue"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": 1,
+                "maxUnavailable": 0
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "food-portal",
+                    "slot": "blue"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "pdgamersg/assessment9-food:v1-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "food-portal",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 2,
+                            "periodSeconds": 3,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "250m",
+                                "memory": "64Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 3,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-15T16:10:39Z",
+                "lastUpdateTime": "2026-10-15T16:10:39Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-10-15T16:10:33Z",
+                "lastUpdateTime": "2026-10-15T16:10:39Z",
+                "message": "ReplicaSet \"food-portal-blue-6fd9dd46db\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 1,
+        "readyReplicas": 3,
+        "replicas": 3,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 3
+    }
+}
+
+$ kubectl --context docker-desktop -n assessment9 apply -f evidence\candidate.yaml
+deployment.apps/food-portal-blue configured
+
+$ kubectl --context docker-desktop -n assessment9 rollout status deployment/food-portal-blue --timeout=75s
+Waiting for deployment "food-portal-blue" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "food-portal-blue" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "food-portal-blue" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "food-portal-blue" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "food-portal-blue" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "food-portal-blue" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "food-portal-blue" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "food-portal-blue" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "food-portal-blue" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "food-portal-blue" rollout to finish: 1 old replicas are pending termination...
+deployment "food-portal-blue" successfully rolled out
+
+$ kubectl --context docker-desktop -n assessment9 get pods -l app=food-portal -o wide
+NAME                                 READY   STATUS        RESTARTS   AGE     IP            NODE                    NOMINATED NODE   READINESS GATES
+food-portal-blue-6647dc7f85-6b54t    1/1     Running       0          15s     10.244.0.45   desktop-control-plane   <none>           <none>
+food-portal-blue-6647dc7f85-7xckb    1/1     Running       0          10s     10.244.0.46   desktop-control-plane   <none>           <none>
+food-portal-blue-6647dc7f85-fl8m9    1/1     Running       0          5s      10.244.0.47   desktop-control-plane   <none>           <none>
+food-portal-blue-6fd9dd46db-56d5s    1/1     Terminating   0          6m26s   10.244.0.26   desktop-control-plane   <none>           <none>
+food-portal-green-6cd476b456-64swx   1/1     Running       0          2m21s   10.244.0.35   desktop-control-plane   <none>           <none>
+food-portal-green-6cd476b456-bvrp2   1/1     Running       0          2m21s   10.244.0.33   desktop-control-plane   <none>           <none>
+food-portal-green-6cd476b456-n764t   1/1     Running       0          2m21s   10.244.0.34   desktop-control-plane   <none>           <none>
+
+$ kubectl --context docker-desktop -n assessment9 patch service food-portal --type=merge -p {"spec": {"selector": {"app": "food-portal", "slot": "blue"}}}
+service/food-portal patched
+
+BLUE-GREEN PROMOTION: healthy blue receives production traffic
+$ kubectl --context docker-desktop -n assessment9 delete deployment food-portal --ignore-not-found=true
+
+$ docker ps -a --filter name=^/assessment9-food-nodeport$ --format {{.Names}}
+assessment9-food-nodeport
+
+$ docker start assessment9-food-nodeport
+assessment9-food-nodeport

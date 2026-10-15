@@ -1,0 +1,53 @@
+$ kubectl --context docker-desktop -n assessment9 get service food-portal -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"food-portal\",\"namespace\":\"assessment9\"},\"spec\":{\"ports\":[{\"nodePort\":30082,\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"food-portal\"},\"type\":\"NodePort\"}}\n"
+        },
+        "creationTimestamp": "2026-10-15T15:48:29Z",
+        "name": "food-portal",
+        "namespace": "assessment9",
+        "resourceVersion": "5743",
+        "uid": "4562796b-1450-454f-9ac2-8fe2757f298e"
+    },
+    "spec": {
+        "clusterIP": "10.96.79.197",
+        "clusterIPs": [
+            "10.96.79.197"
+        ],
+        "externalTrafficPolicy": "Cluster",
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "nodePort": 30082,
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "food-portal",
+            "slot": "blue"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
+PASS: production traffic stayed on stable blue
+$ kubectl --context docker-desktop -n assessment9 set image deployment/food-portal-green food-portal=pdgamersg/assessment9-food:v1-3
+deployment.apps/food-portal-green image updated
+
+$ kubectl --context docker-desktop -n assessment9 rollout status deployment/food-portal-green --timeout=120s
+deployment "food-portal-green" successfully rolled out
+
+PASS: previous stable release restored automatically

@@ -1,0 +1,10 @@
+$ docker run -d --name assessment9-smoke-food-2 --restart no -p 127.0.0.1:8192:80 pdgamersg/assessment9-food:v1-2
+1a8be64877bcf0e128c7ebc0170f900a0012ad3f3e7fb2dae47316ad4aa88e57
+
+$ docker exec assessment9-smoke-food-2 nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+PASS: HTTP 200, valid nginx config, source SHA-256 63466e2a7f8baab16713204f07e634846bb7503f0af15ca2830dbc254ba7a357
+$ docker rm -f assessment9-smoke-food-2
+assessment9-smoke-food-2

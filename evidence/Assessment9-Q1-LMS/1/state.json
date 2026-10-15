@@ -1,0 +1,8 @@
+{
+  "app": "lms-portal",
+  "image": "pdgamersg/assessment9-lms:v1-1",
+  "version": "v1-1",
+  "faulty": false,
+  "deployment": "lms-portal",
+  "previous_image": "pdgamersg/assessment9-lms:stable"
+}

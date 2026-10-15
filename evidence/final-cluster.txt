@@ -1,0 +1,23 @@
+﻿NAME                                READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS        IMAGES                                SELECTOR
+deployment.apps/food-portal-blue    3/3     3            3           20m   food-portal       pdgamersg/assessment9-food:v2-4       app=food-portal,slot=blue
+deployment.apps/food-portal-green   3/3     3            3           16m   food-portal       pdgamersg/assessment9-food:v1-3       app=food-portal,slot=green
+deployment.apps/hospital-portal     3/3     3            3           42m   hospital-portal   pdgamersg/assessment9-hospital:v2-4   app=hospital-portal
+deployment.apps/lms-portal          2/2     2            2           42m   lms-portal        pdgamersg/assessment9-lms:v2-4        app=lms-portal
+
+NAME                                     READY   STATUS    RESTARTS   AGE   IP            NODE                    NOMINATED NODE   READINESS GATES
+pod/food-portal-blue-6647dc7f85-6b54t    1/1     Running   0          14m   10.244.0.45   desktop-control-plane   <none>           <none>
+pod/food-portal-blue-6647dc7f85-7xckb    1/1     Running   0          14m   10.244.0.46   desktop-control-plane   <none>           <none>
+pod/food-portal-blue-6647dc7f85-fl8m9    1/1     Running   0          14m   10.244.0.47   desktop-control-plane   <none>           <none>
+pod/food-portal-green-6cd476b456-64swx   1/1     Running   0          16m   10.244.0.35   desktop-control-plane   <none>           <none>
+pod/food-portal-green-6cd476b456-bvrp2   1/1     Running   0          16m   10.244.0.33   desktop-control-plane   <none>           <none>
+pod/food-portal-green-6cd476b456-n764t   1/1     Running   0          16m   10.244.0.34   desktop-control-plane   <none>           <none>
+pod/hospital-portal-86b9b78669-c2hll     1/1     Running   0          15m   10.244.0.44   desktop-control-plane   <none>           <none>
+pod/hospital-portal-86b9b78669-jgpg2     1/1     Running   0          15m   10.244.0.40   desktop-control-plane   <none>           <none>
+pod/hospital-portal-86b9b78669-vzd48     1/1     Running   0          15m   10.244.0.43   desktop-control-plane   <none>           <none>
+pod/lms-portal-864f89777c-7x7vh          1/1     Running   0          15m   10.244.0.41   desktop-control-plane   <none>           <none>
+pod/lms-portal-864f89777c-tpgbx          1/1     Running   0          15m   10.244.0.42   desktop-control-plane   <none>           <none>
+
+NAME                      TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+service/food-portal       NodePort   10.96.79.197   <none>        80:30082/TCP   42m   app=food-portal,slot=blue
+service/hospital-portal   NodePort   10.96.20.202   <none>        80:30083/TCP   42m   app=hospital-portal
+service/lms-portal        NodePort   10.96.224.59   <none>        80:30081/TCP   42m   app=lms-portal
